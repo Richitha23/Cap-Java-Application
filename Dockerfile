@@ -1,7 +1,8 @@
-
-FROM openjdk:17-jdk-slim
+FROM maven:3.8.7-eclipse-temurin-8 AS builder
 WORKDIR /app
-COPY target/myapp.jar app.jar
+COPY . .
+RUN mvn clean package
+
+FROM jetty:9.4-jdk8
+COPY --from=builder /app/target/maven-web-application.war /var/lib/jetty/webapps/root.war
 EXPOSE 8080
-ENV JAVA_OPTS="-Xms256m -Xmx512m"
-ENTRYPOINT ["java", "-jar", "app.jar"]
